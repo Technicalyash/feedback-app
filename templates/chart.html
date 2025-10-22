@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sentiment Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>📈 Sentiment Dashboard</h1>
+    <canvas id="sentimentChart" width="400" height="200"></canvas>
+    <a href="/">⬅ Back to Feedback</a>
+  </div>
+
+  <script>
+    async function loadChart() {
+      const res = await fetch("/data");
+      const data = await res.json();
+
+      const ctx = document.getElementById("sentimentChart").getContext("2d");
+      new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: "Average Sentiment Score",
+            data: data.values,
+            borderWidth: 2
+          }]
+        }
+      });
+    }
+    loadChart();
+  </script>
+</body>
+</html>
