@@ -1,63 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Feedback Form</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-  <div class="container">
-    <h1>🌥️ Cloud Feedback App</h1>
-    <form id="feedbackForm">
-      <input type="text" id="name" placeholder="Your Name" required>
-      <input type="email" id="email" placeholder="Your Email" required>
-      <textarea id="feedback" placeholder="Share your feedback..." required></textarea>
+// Form submit with spinner
+const form = document.getElementById('feedbackForm');
+const spinner = document.getElementById('spinner');
 
-      <label>Rating:</label>
-      <div class="stars">
-        <input type="number" id="rating" min="1" max="5" placeholder="1-5" required>
-      </div>
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  spinner.style.display = 'block';
 
-      <button type="submit">Submit</button>
-      <div id="spinner" class="spinner hidden"></div>
-    </form>
-    <p id="message"></p>
-    <a href="/chart">📊 View Sentiment Analysis</a>
-  </div>
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData.entries());
 
-  <script>
-    const form = document.getElementById("feedbackForm");
-    const spinner = document.getElementById("spinner");
-    const message = document.getElementById("message");
+  // Dummy fetch example (replace with your Flask POST endpoint)
+  await fetch('/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      spinner.classList.remove("hidden");
-      message.textContent = "";
+  spinner.style.display = 'none';
+  alert('Feedback submitted!');
+  form.reset();
+});
 
-      const data = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        feedback: document.getElementById("feedback").value,
-        rating: parseInt(document.getElementById("rating").value)
-      };
-
-      try {
-        const res = await fetch("/submit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-        const result = await res.json();
-        spinner.classList.add("hidden");
-        message.textContent = "✅ Feedback submitted successfully!";
-        form.reset();
-      } catch (error) {
-        spinner.classList.add("hidden");
-        message.textContent = "❌ Error submitting feedback!";
-      }
-    });
-  </script>
-</body>
-</html>
+// Chart.js example (for dashboard)
+const ctx = document.getElementById('sentimentChart');
+if(ctx){
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Positive', 'Neutral', 'Negative'],
+      datasets: [{
+        label: 'Feedback Count',
+        data: [12, 5, 3], // replace with actual counts from backend
+        backgroundColor: ['#4CAF50','#FFC107','#F44336']
+      }]
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 1000 },
+    }
+  });
+}
