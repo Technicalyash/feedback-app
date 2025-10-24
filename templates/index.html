@@ -1,42 +1,71 @@
-// Form submit with spinner
-const form = document.getElementById('feedbackForm');
-const spinner = document.getElementById('spinner');
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Feedback • Cloud Mini Project</title>
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  spinner.style.display = 'block';
+  <!-- Fonts & icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-  const formData = new FormData(form);
-  const data = Object.fromEntries(formData.entries());
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-  // Dummy fetch example (replace with your Flask POST endpoint)
-  await fetch('/submit', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
+  <!-- D3 + other libs used on dashboard too (cached once) -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"></script>
+</head>
+<body>
+  <nav class="topbar">
+    <div class="logo">☁️ Feedback Cloud</div>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/dashboard">Dashboard</a>
+    </div>
+  </nav>
 
-  spinner.style.display = 'none';
-  alert('Feedback submitted!');
-  form.reset();
-});
+  <main class="page container">
+    <section class="card form-card fade-in-up">
+      <h1 class="title">Share Feedback — Help us improve</h1>
+      <p class="muted">Short, honest, and (optionally) anonymous.</p>
 
-// Chart.js example (for dashboard)
-const ctx = document.getElementById('sentimentChart');
-if(ctx){
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Positive', 'Neutral', 'Negative'],
-      datasets: [{
-        label: 'Feedback Count',
-        data: [12, 5, 3], // replace with actual counts from backend
-        backgroundColor: ['#4CAF50','#FFC107','#F44336']
-      }]
-    },
-    options: {
-      responsive: true,
-      animation: { duration: 1000 },
-    }
-  });
-}
+      <form id="feedbackForm" class="form">
+        <div class="row">
+          <input id="name" name="name" type="text" placeholder="Your name (optional)"/>
+          <input id="email" name="email" type="email" placeholder="Email (optional)"/>
+        </div>
+
+        <textarea id="feedback" name="feedback" rows="5" placeholder="Write your feedback..." required></textarea>
+
+        <div class="rating-row">
+          <div class="label">Rating</div>
+          <div class="stars" id="stars">
+            <button data-value="1">★</button>
+            <button data-value="2">★</button>
+            <button data-value="3" class="active">★</button>
+            <button data-value="4">★</button>
+            <button data-value="5">★</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="submitBtn" class="btn primary">Send Feedback</button>
+          <div id="spinner" class="spinner hidden" aria-hidden="true"></div>
+        </div>
+
+        <div id="toast" class="toast hidden"></div>
+      </form>
+    </section>
+
+    <section class="card preview-card fade-in-up delay-100">
+      <h2>Recent feedback (live)</h2>
+      <div id="feedbackCards" class="feedback-list"></div>
+    </section>
+  </main>
+
+  <footer class="footer">Built during a 10-day challenge • Live ML insights</footer>
+
+  <!-- app script (contains both form logic and small helpers) -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
